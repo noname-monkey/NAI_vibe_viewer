@@ -1,0 +1,11 @@
+{
+  "thumbnail_size": 128,
+  "directories": [
+    "./sample_potions"
+  ],
+  "sort_order": "time_desc",
+  "window_width": 800,
+  "window_height": 645,
+  "show_images_without_thumbnails": true,
+  "version": "v4.5"
+}
