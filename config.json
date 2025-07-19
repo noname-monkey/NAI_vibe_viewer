@@ -1,9 +1,7 @@
 {
   "thumbnail_size": 128,
-  "directories": [
-    "./sample_potions"
-  ],
-  "sort_order": "time_desc",
+  "directories": [],
+  "sort_order": "name_asc",
   "window_width": 800,
   "window_height": 645,
   "show_images_without_thumbnails": true,
