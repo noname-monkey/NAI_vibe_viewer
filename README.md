@@ -6,7 +6,7 @@ PC内に保存されたポーションファイルを一覧表示したり、画
 pip install -r requirements.txt
 python main.py
 ```
-vibe_viewer.exeからも実行可能です。
+vibe_viewer.exeからも実行可能です。Windows Defenderに怒られる場合は許可するか自作してください。  
 exeを自作したい場合は
 ```bash
 python -m pip install pyinstaller
