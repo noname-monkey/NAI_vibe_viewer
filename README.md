@@ -7,6 +7,7 @@ pip install -r requirements.txt
 python main.py
 ```
 vibe_viewer.exeからも実行可能です。Windows Defenderに怒られる場合は許可するか自作してください。  
+https://github.com/noname-monkey/NAI_vibe_viewer/releases
 exeを自作したい場合は
 ```bash
 python -m pip install pyinstaller
