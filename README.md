@@ -10,7 +10,7 @@ vibe_viewer.exeからも実行可能です。Windows Defenderに怒られる場�
 exeを自作したい場合は
 ```bash
 python -m pip install pyinstaller
-python -m pyinstaller -n vibe_viewer --onefile --noconsole main.py
+python -m PyInstaller -n vibe_viewer --onefile --noconsole main.py
 ```
 
 ## ブラウズタブ
