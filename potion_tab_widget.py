@@ -10,6 +10,49 @@ from PIL import Image
 from utils import ClickableThumbnail
 
 
+def extract_json_from_bytes(data: bytes, marker=b'{"Comment":') -> dict:
+    # 1) JSON開始位置
+    start = data.find(marker)
+    if start == -1:
+        raise ValueError("JSON marker not found")
+
+    # 2) 波括弧の対応を数えて JSON の終端を見つける
+    i = start
+    depth = 0
+    in_string = False
+    escape = False
+
+    while i < len(data):
+        c = data[i]
+
+        if in_string:
+            if escape:
+                escape = False
+            elif c == 0x5C:  # backslash \
+                escape = True
+            elif c == 0x22:  # double quote "
+                in_string = False
+        else:
+            if c == 0x22:      # "
+                in_string = True
+            elif c == 0x7B:    # {
+                depth += 1
+            elif c == 0x7D:    # }
+                depth -= 1
+                if depth == 0:
+                    end = i + 1
+                    break
+        i += 1
+    else:
+        raise ValueError("JSON end not found")
+
+    json_bytes = data[start:end]
+
+    # 3) JSON は ASCII/UTF-8 として解釈できる想定（壊れている場合は replace）
+    json_text = json_bytes.decode("utf-8", errors="strict")
+    return json.loads(json_text)
+
+
 def create_placeholder_pixmap(size=150) -> QPixmap:
     pixmap = QPixmap(size, size)
     pixmap.fill(Qt.GlobalColor.black)
@@ -165,7 +208,7 @@ class PotionTabWidget(QWidget):
     def dragEnterEvent(self, event: QDragEnterEvent):
         if event.mimeData().hasUrls():
             for url in event.mimeData().urls():
-                if url.toLocalFile().lower().endswith(".png"):
+                if url.toLocalFile().lower().endswith((".png", ".webp")):
                     event.acceptProposedAction()
                     return
         event.ignore()
@@ -173,7 +216,7 @@ class PotionTabWidget(QWidget):
     def dropEvent(self, event: QDropEvent):
         for url in event.mimeData().urls():
             filepath = url.toLocalFile()
-            if filepath.lower().endswith(".png"):
+            if filepath.lower().endswith((".png", ".webp")):
                 self.handle_dropped_image(filepath)
 
     def handle_dropped_image(self, filepath):
@@ -191,7 +234,10 @@ class PotionTabWidget(QWidget):
 
         try:
             img = Image.open(filepath)
-            comment = img.info.get("Comment")
+            if "exif" in img.info:
+                comment = extract_json_from_bytes(img.info["exif"]).get("Comment")
+            else:
+                comment = img.info.get("Comment")
             if not comment:
                 raise ValueError("no comment")
             info = json.loads(comment)
@@ -202,7 +248,7 @@ class PotionTabWidget(QWidget):
                 return
             else:
                 strengths = info["reference_strength_multiple"]
-        except Exception:
+        except Exception as e:
             self.preview_label.setText("メタデータ無し")
             return
 
